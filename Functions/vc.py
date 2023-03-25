@@ -236,4 +236,4 @@ def length_overview(vocabs):
     for vocab in vocabs:
         length = len(vocab[0])
         name = vocab[1]
-        print(name + ": " + length + " keywords")
+        print(name + ": " + str(length) + " keywords")
