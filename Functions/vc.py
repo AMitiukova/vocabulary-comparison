@@ -8,6 +8,7 @@ import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import re
+from polyleven import levenshtein
 
 def generate():
     return 0
@@ -33,6 +34,38 @@ def tag_compare(vocabs): #input scheme: [(vocab, vocab_name), (vocab, vocab_name
         vgl[tag]["sum"] = sum
     return vgl
 
+def tag_compare_fuzzy(vocabs, distance): #input scheme: [(vocab, vocab_name), (vocab, vocab_name)] - vocab (dict), vocab_name (str)
+    #collection of all distinct tags
+    tags = []
+    for vocab in vocabs:
+        for key in vocab[0].keys():
+            if key not in tags:
+                tags.append(key)
+    #systematic comparison of all distinct tags with single vocabs
+    vgl = {}
+    for tag in tags:
+        #print(tag)
+        matches = []
+        vgl[tag] = defaultdict(generate)
+        sum_total = 0
+        sum_once = 0
+        for vocab in vocabs:
+            found = False
+            for key in vocab[0].keys():
+                if levenshtein(tag, key, distance) < distance:
+                    vgl[tag][vocab[1]] = vgl[tag][vocab[1]] + 1
+                    matches.append((key, vocab[1]))
+                    sum_total = sum_total + 1
+                    found = True
+                else:
+                    vgl[tag][vocab[1]] = vgl[tag][vocab[1]]
+            if found == True:
+              sum_once = sum_once + 1
+        vgl[tag]["sum_total"] = sum_total #number of actual overlaps (more than one per vocab possible)
+        vgl[tag]["sum_once"] = sum_once #number of different vocabs
+        vgl[tag]["matches"] = matches #pairs of matches + vocabularies they come from
+    return vgl
+
 def overlaps_overview(vocabs):
     comp = tag_compare(vocabs)
     sums = []
@@ -45,6 +78,18 @@ def overlaps_overview(vocabs):
         else:
             print("Overlaps between", key, "vocabularies:", sum_counter[key], "keywords")
 
+def overlaps_overview_fuzzy(vocabs, distance):
+    comp = tag_compare_fuzzy(vocabs, distance)
+    sums = []
+    for key in comp.keys():
+        sums.append(comp[key]["sum_once"])
+    sum_counter = Counter(sums)
+    for key in sorted(sum_counter.keys()):
+        if key == 1:
+            print("No overlaps:", sum_counter[key], "keywords")
+        else:
+            print("Overlaps between", key, "vocabularies:", sum_counter[key], "keywords")
+            
 def vocab_compare(vocab1, vocab2):
     zähler = 0
     for tag1 in vocab1.keys():
