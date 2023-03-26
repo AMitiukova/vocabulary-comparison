@@ -98,6 +98,17 @@ def vocab_compare(vocab1, vocab2):
                 zähler = zähler + 1
     return zähler
 
+def vocab_compare_fuzzy(vocab1, vocab2, distance):
+    zähler = 0
+    found = False
+    for tag1 in vocab1.keys():
+        for tag2 in vocab2.keys():
+            if levenshtein(tag1, tag2, distance) < distance:
+                found = True
+        if found == True: #counts only one match per tag1 - overlaps can be asymmetrical 
+            zähler = zähler + 1
+    return zähler
+
 def vocab_matrix(vocabs):
     vocabs_dict = {}
     for vocab in vocabs:
@@ -107,6 +118,18 @@ def vocab_matrix(vocabs):
         for other in vocabs_dict.keys():
             titel = entry + "_" + other #e.g. acdh_dc
             count = vocab_compare(vocabs_dict[entry], vocabs_dict[other])
+            matrix[titel] = count
+    return matrix
+
+def vocab_matrix_fuzzy(vocabs, distance):
+    vocabs_dict = {}
+    for vocab in vocabs:
+        vocabs_dict[vocab[1]] = vocab[0]
+    matrix = {}
+    for entry in vocabs_dict.keys():
+        for other in vocabs_dict.keys():
+            titel = entry + "_" + other #e.g. acdh_dc
+            count = vocab_compare_fuzzy(vocabs_dict[entry], vocabs_dict[other], distance)
             matrix[titel] = count
     return matrix
 
@@ -126,9 +149,46 @@ def table_overlaps(vocabs):
             zeile = zeile + 1
     print(tabulate(tabelle, headers = headers_tab))
 
+def table_overlaps_fuzzy(vocabs, distance):
+    matrix = vocab_matrix_fuzzy(vocabs, distance)
+    tabelle = []
+    for vocab in vocabs:
+        tabelle.append([vocab[1]])
+    headers_tab = ["Vocabulary"]
+    for element in tabelle:
+        headers_tab = headers_tab + element
+    zeile = 0
+    for key in matrix.keys():
+        tabelle[zeile].append(matrix[key])
+        if len(tabelle[zeile]) == (len(vocabs) + 1): 
+            zeile = zeile + 1
+    print(tabulate(tabelle, headers = headers_tab))
+
 #generate table: percentage of overlaps between compared vocabularies
 def table_relative(vocabs):
     matrix = vocab_matrix(vocabs)
+    tabelle = []
+    for vocab in vocabs:
+        tabelle.append([vocab[1]])
+    headers_tab = ["Vocabulary"]
+    for element in tabelle:
+        headers_tab = headers_tab + element
+    zeile = 0
+    for key in matrix.keys():
+        tabelle[zeile].append(matrix[key])
+        if len(tabelle[zeile]) == (len(vocabs) + 1): 
+            zeile = zeile + 1
+    tabelle_proz = []
+    for row in tabelle:
+        nur_zahlen = [x if type(x)==int else 0 for x in row]
+        maximum = max(nur_zahlen)
+        row_new = [round((x*100/maximum), 2) if type(x)==int else x for x in row]
+        tabelle_proz.append(row_new)
+    print(tabulate(tabelle_proz, headers = headers_tab))
+
+#generate table: percentage of overlaps between compared vocabularies
+def table_relative_fuzzy(vocabs, distance):
+    matrix = vocab_matrix_fuzzy(vocabs, distance)
     tabelle = []
     for vocab in vocabs:
         tabelle.append([vocab[1]])
@@ -168,7 +228,28 @@ def heatmap(vocabs):
         maximum = max(nur_zahlen)
         row_new = [round((x*100/maximum), 2) if type(x)==int else x for x in row]
         tabelle_proz.append(row_new)
-        
+    
+    #generate heatmap of vocabularity similarity (= percentage of overlaps)
+def heatmap_fuzzy(vocabs, distance):
+    matrix = vocab_matrix(vocabs, distance)
+    tabelle = []
+    for vocab in vocabs:
+        tabelle.append([vocab[1]])
+    headers_tab = ["Vocabulary"]
+    for element in tabelle:
+        headers_tab = headers_tab + element
+    zeile = 0
+    for key in matrix.keys():
+        tabelle[zeile].append(matrix[key])
+        if len(tabelle[zeile]) == (len(vocabs) + 1): 
+            zeile = zeile + 1
+    tabelle_proz = []
+    for row in tabelle:
+        nur_zahlen = [x if type(x)==int else 0 for x in row]
+        maximum = max(nur_zahlen)
+        row_new = [round((x*100/maximum), 2) if type(x)==int else x for x in row]
+        tabelle_proz.append(row_new)
+
     #Zeilen- und Spaltenlabels definieren
     zeilen = []
     for vocab in vocabs:
@@ -230,6 +311,18 @@ def keywords_multiple(vocabs, x):
                     vocabs_list.append(element)
             print(key, vocabs_list)
 
+def keywords_multiple_fuzzy(vocabs, x, distance):
+    comp = tag_compare_fuzzy(vocabs)
+    for key in comp.keys():
+        if comp[key]["sum_once"] >= x:
+            vocabs_list = []
+            for element in comp[key].keys():
+                if element == "sum_once":
+                    continue
+                if comp[key][element] == 1:
+                    vocabs_list.append(element)
+            print(key, vocabs_list)
+
 #print tags that appear in only one vocabulary (+ the respective vocabulary)
 def keywords_single(vocabs):
     comp = tag_compare(vocabs)
@@ -237,6 +330,17 @@ def keywords_single(vocabs):
         if comp[key]["sum"] == 1:
             for element in comp[key].keys():
                 if element == "sum":
+                    continue
+                if comp[key][element] == 1:
+                    print(key, "(" + element + ")")
+
+#print tags that appear in only one vocabulary (+ the respective vocabulary)
+def keywords_single_fuzzy(vocabs, distance):
+    comp = tag_compare(vocabs, distance)
+    for key in comp.keys():
+        if comp[key]["sum_once"] == 1:
+            for element in comp[key].keys():
+                if element == "sum_once":
                     continue
                 if comp[key][element] == 1:
                     print(key, "(" + element + ")")
