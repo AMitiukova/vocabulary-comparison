@@ -8,11 +8,12 @@ import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import re
+from polyleven import levenshtein
 
 def generate():
     return 0
 
-def tag_compare(vocabs, distance): #input scheme: [(vocab, vocab_name), (vocab, vocab_name)] - vocab (dict), vocab_name (str)
+def tag_compare_fuzzy(vocabs, distance): #input scheme: [(vocab, vocab_name), (vocab, vocab_name)] - vocab (dict), vocab_name (str)
     #collection of all distinct tags
     tags = []
     for vocab in vocabs:
@@ -25,23 +26,23 @@ def tag_compare(vocabs, distance): #input scheme: [(vocab, vocab_name), (vocab, 
         matches = []
         vgl[tag] = defaultdict(generate)
         sum = 0
-        for vocab in vocabs:
-            sum_vocab = 0
+        #sum_vocabs = 0
+        for vocab in vocabs: 
             for key in vocab[0].keys():
-                if nltk.edit_distance(tag, key) <= distance:
+                if levenshtein(tag, key, distance) < distance:
                     vgl[tag][vocab[1]] = vgl[tag][vocab[1]] + 1
                     matches.append((key, vocab[1]))
                     sum = sum + 1
-                    sum_vocab = 1
+                    #sum_vocabs = 1
                 else:
                     vgl[tag][vocab[1]] = vgl[tag][vocab[1]]
-        vgl[tag]["sum_total"] = sum #number of actual overlaps (more than one per vocab possible)
-        vgl[tag]["sum"] = sum_vocab #number of different vocabs
-        vgl[tag]["matches"] = matches
+        vgl[tag]["sum"] = sum #number of actual overlaps (more than one per vocab possible)
+        #vgl[tag]["sum"] = sum_vocabs #number of different vocabs
+        vgl[tag]["matches"] = matches #pairs of matches + vocabularies they come from
     return vgl
 
-def overlaps_overview(vocabs, distance):
-    comp = tag_compare(vocabs, distance)
+def overlaps_overview_fuzzy(vocabs, distance):
+    comp = tag_compare_fuzzy(vocabs, distance)
     sums = []
     for key in comp.keys():
         sums.append(comp[key]["sum"])
