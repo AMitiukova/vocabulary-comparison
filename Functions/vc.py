@@ -89,7 +89,7 @@ def overlaps_overview_fuzzy(vocabs, distance):
             print("No overlaps:", sum_counter[key], "keywords")
         else:
             print("Overlaps between", key, "vocabularies:", sum_counter[key], "keywords")
-            
+
 def vocab_compare(vocab1, vocab2):
     zähler = 0
     for tag1 in vocab1.keys():
@@ -264,6 +264,8 @@ def search(vocabs, word):
                 vocabs_list.append(element)
         print("The keyword \"" + word + "\" is used in " + str(comp[word]["sum"]) + " different vocabularies, namely in:")
         print(vocabs_list)
+    else:
+        print("The keyword does not appear in any of the compared vocabularies.")
 
 #show all tags for a certain vocab, alphabetically ordered
 def show(vocab):
