@@ -375,29 +375,36 @@ def keywords_multiple_fuzzy(vocabs, x, distance):
 #print tags that appear in only one vocabulary (+ the respective vocabulary)
 def keywords_single(vocabs, limit):
     comp = tag_compare(vocabs)
-    start = 0
+    count = {}
     for key in comp.keys():
         if comp[key]["sum"] == 1:
             for element in comp[key].keys():
                 if element == "sum":
-                    continue
+                  continue
                 if comp[key][element] == 1:
-                    print(key, "(" + element + ")")
-                    start = start + 1
-                    if start == limit:
-                        break
+                  if element not in count.keys():
+                    count[element] = 0
+                  else:
+                    count[element] += 1
+                    if count[element] <= limit:
+                      print(key, "(" + element + ")")
             
-
 #print tags that appear in only one vocabulary (+ the respective vocabulary)
-def keywords_single_fuzzy(vocabs, distance):
-    comp = tag_compare(vocabs, distance)
+def keywords_single_fuzzy(vocabs, distance, limit):
+    comp = tag_compare_fuzzy(vocabs)
+    count = {}
     for key in comp.keys():
         if comp[key]["sum_once"] == 1:
             for element in comp[key].keys():
                 if element == "sum_once":
-                    continue
+                  continue
                 if comp[key][element] == 1:
-                    print(key, "(" + element + ")")
+                  if element not in count.keys():
+                    count[element] = 0
+                  else:
+                    count[element] += 1
+                    if count[element] <= limit:
+                      print(key, "(" + element + ")")
 
 #show overlaps between multiple vocabs (= tags that appear in all listed vocabs)
 def show_overlaps(vocab_liste):
@@ -422,6 +429,22 @@ def search(vocabs, word):
                 vocabs_list.append(element)
         print("The keyword \"" + word + "\" is used in " + str(comp[word]["sum"]) + " different vocabularies, namely in:")
         print(vocabs_list)
+    else:
+        print("The keyword does not appear in any of the compared vocabularies.")
+
+def search_fuzzy(vocabs, word, distance):
+    comp = tag_compare_fuzzy(vocabs, distance)
+    if word in comp.keys():
+        vocabs_list = []
+        for element in comp[word].keys():
+            if element == "sum_once" or element == "sum_total":
+                continue
+            if comp[word][element] > 1:
+                vocabs_list.append(element)
+        print("The keyword \"" + word + "\" is used in " + str(comp[word]["sum"]) + " different vocabularies, namely in:")
+        print(vocabs_list)
+        print("Within the fuzzy matching, it is matched to the following variants:")
+        print(comp[word]["matches"])
     else:
         print("The keyword does not appear in any of the compared vocabularies.")
 
