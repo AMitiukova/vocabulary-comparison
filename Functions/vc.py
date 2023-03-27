@@ -361,7 +361,7 @@ def keywords_multiple(vocabs, x):
             print(key, vocabs_list)
 
 def keywords_multiple_fuzzy(vocabs, x, distance):
-    comp = tag_compare_fuzzy(vocabs distance)
+    comp = tag_compare_fuzzy(vocabs, distance)
     for key in comp.keys():
         if comp[key]["sum_once"] >= x:
             vocabs_list = []
