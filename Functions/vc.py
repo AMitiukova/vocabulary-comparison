@@ -378,7 +378,6 @@ def keywords_single(vocabs, limit):
     start = 0
     while start < limit:
         for key in comp.keys():
-            start = start + 1
             if comp[key]["sum"] == 1:
                 for element in comp[key].keys():
                     if element == "sum":
