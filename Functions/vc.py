@@ -388,3 +388,12 @@ def length_overview(vocabs):
         length = len(vocab[0])
         name = vocab[1]
         print(name + ": " + str(length) + " keywords")
+
+#keywords_distinct()
+def keywords_distinct(vocabs):
+    tags = []
+    for vocab in vocabs:
+        for key in vocab[0].keys():
+            if key not in tags:
+                tags.append(key)
+    return(len(tags))
