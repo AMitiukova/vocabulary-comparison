@@ -274,6 +274,8 @@ def heatmap(vocabs):
 
     #Verbesserung des Layouts
     fig.tight_layout()
+
+    plt.show()
     
 #generate heatmap of vocabularity similarity (= percentage of overlaps)
 def heatmap_fuzzy(vocabs, distance):
