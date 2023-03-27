@@ -275,6 +275,7 @@ def heatmap(vocabs):
     #Verbesserung des Layouts
     fig.tight_layout()
 
+    #return fig
     plt.show()
     
 #generate heatmap of vocabularity similarity (= percentage of overlaps)
