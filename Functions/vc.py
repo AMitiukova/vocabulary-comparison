@@ -229,7 +229,53 @@ def heatmap(vocabs):
         row_new = [round((x*100/maximum), 2) if type(x)==int else x for x in row]
         tabelle_proz.append(row_new)
     
-    #generate heatmap of vocabularity similarity (= percentage of overlaps)
+    #Zeilen- und Spaltenlabels definieren
+    zeilen = []
+    for vocab in vocabs:
+        zeilen.append(vocab[1])
+    spalten = zeilen
+
+    #Daten definieren
+    tabelle_proz_zahlen = [] #neue Liste von Listen exkl. Strings notwendig
+    for zeile in tabelle_proz:
+        nur_zahlen = [x for x in zeile if type(x)!=str]
+        tabelle_proz_zahlen.append(nur_zahlen)
+    daten = np.array(tabelle_proz_zahlen)
+
+    #Initialisieren von Plots
+    fig, heatmap = plt.subplots()
+    im = heatmap.imshow(daten, cmap="YlGn")
+
+    #Größe der Abbildung einstellen
+    fig.set_figheight(8)
+    fig.set_figwidth(10)
+
+    #Labels hinzufügen
+    heatmap.set_xticks(np.arange(len(spalten)), labels=spalten)
+    heatmap.set_yticks(np.arange(len(zeilen)), labels=zeilen)
+
+    #Spaltenbeschriftung nach oben
+    heatmap.tick_params(top=True, bottom=False, labeltop=True, labelbottom=False)
+
+    #Spaltenbeschriftung rotieren
+    plt.setp(heatmap.get_xticklabels(), rotation=45, ha="left", rotation_mode="anchor")
+
+    #Loop über Daten --> Werte pro Heatmap-Kästchen anzeigen
+    for i in range(len(zeilen)):
+        for j in range(len(spalten)):
+            text = heatmap.text(j, i, daten[i, j], ha="center", va="center", color="black")
+
+    #Legende (Colorbar) hinzufügen
+    legende = heatmap.figure.colorbar(im, ax=heatmap)
+    legende.ax.set_ylabel(ylabel="Overlaps in percent", rotation=-90, va="bottom")
+
+    #Titel hinzufügen
+    heatmap.set_title("Similarity of vocabularies", fontsize=15)
+
+    #Verbesserung des Layouts
+    fig.tight_layout()
+    
+#generate heatmap of vocabularity similarity (= percentage of overlaps)
 def heatmap_fuzzy(vocabs, distance):
     matrix = vocab_matrix(vocabs, distance)
     tabelle = []
