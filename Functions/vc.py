@@ -280,7 +280,7 @@ def heatmap(vocabs):
     
 #generate heatmap of vocabularity similarity (= percentage of overlaps)
 def heatmap_fuzzy(vocabs, distance):
-    matrix = vocab_matrix(vocabs, distance)
+    matrix = vocab_matrix_fuzzy(vocabs, distance)
     tabelle = []
     for vocab in vocabs:
         tabelle.append([vocab[1]])
