@@ -376,15 +376,17 @@ def keywords_multiple_fuzzy(vocabs, x, distance):
 def keywords_single(vocabs, limit):
     comp = tag_compare(vocabs)
     start = 0
-    while start < limit:
-        for key in comp.keys():
-            if comp[key]["sum_once"] == 1:
-                for element in comp[key].keys():
-                    if element == "sum_once":
-                        continue
-                    if comp[key][element] == 1:
-                        print(key, "(" + element + ")")
-                        start = start + 1
+    for key in comp.keys():
+        if comp[key]["sum"] == 1:
+            for element in comp[key].keys():
+                if element == "sum":
+                    continue
+                if comp[key][element] == 1:
+                    print(key, "(" + element + ")")
+                    start = start + 1
+                    if start == limit:
+                        break
+            
 
 #print tags that appear in only one vocabulary (+ the respective vocabulary)
 def keywords_single_fuzzy(vocabs, distance):
