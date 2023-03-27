@@ -437,7 +437,7 @@ def search_fuzzy(vocabs, word, distance):
     if word in comp.keys():
         vocabs_list = []
         for element in comp[word].keys():
-            if element == "sum_once" or element == "sum_total":
+            if element == "sum_once" or element == "sum_total" or element == "matches":
                 continue
             if comp[word][element] >= 1:
                 vocabs_list.append(element)
