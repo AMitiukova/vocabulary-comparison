@@ -385,6 +385,7 @@ def keywords_single(vocabs, limit):
                         continue
                     if comp[key][element] == 1:
                         print(key, "(" + element + ")")
+                        start = start + 1
 
 #print tags that appear in only one vocabulary (+ the respective vocabulary)
 def keywords_single_fuzzy(vocabs, distance):
