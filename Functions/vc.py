@@ -441,7 +441,7 @@ def search_fuzzy(vocabs, word, distance):
                 continue
             if comp[word][element] >= 1:
                 vocabs_list.append(element)
-        print("The keyword \"" + word + "\" is used in " + str(comp[word]["sum"]) + " different vocabularies, namely in:")
+        print("The keyword \"" + word + "\" is used in " + str(comp[word]["sum_once"]) + " different vocabularies, namely in:")
         print(vocabs_list)
         print("Within the fuzzy matching, it is matched to the following variants:")
         print(comp[word]["matches"])
@@ -474,3 +474,8 @@ def keywords_distinct(vocabs):
             if key not in tags:
                 tags.append(key)
     return(len(tags))
+
+def matches(vocabs, vocab, distance):
+    comp = tag_compare_fuzzy(vocabs, distance)
+    for key in vocab.keys():
+        print(comp[key]["matches"])
